@@ -1,18 +1,17 @@
 export const api = {
   icon: '🚀',
-  name: 'templates.do',
-  description: 'Cloudflare Worker Template',
-  url: 'https://templates.do/api',
+  name: 'jsn.do',
+  description: 'JSON URL to JSON body converter.',
+  url: 'https://jsn.do/api',
   type: 'https://apis.do/templates',
   endpoints: {
-    listCategories: 'https://templates.do/api',
-    getCategory: 'https://templates.do/:type',
+    convert: 'https://jsn.do/:jsonBody'
   },
-  site: 'https://templates.do',
-  login: 'https://templates.do/login',
-  signup: 'https://templates.do/signup',
-  subscribe: 'https://templates.do/subscribe',
-  repo: 'https://github.com/drivly/templates.do',
+  site: 'https://jsn.do',
+  login: 'https://jsn.do/login',
+  signup: 'https://jsn.do/signup',
+  subscribe: 'https://jsn.do/subscribe',
+  repo: 'https://github.com/drivly/jsn.do',
 }
 
 export const gettingStarted = [
@@ -21,7 +20,7 @@ export const gettingStarted = [
 ]
 
 export const examples = {
-  listItems: 'https://templates.do/worker',
+  listItems: 'https://jsn.do/{ "hello": "world", "true": false }',
 }
 
 export default {
@@ -29,11 +28,15 @@ export default {
     const { user, hostname, pathname, rootPath, pathSegments, query } = await env.CTX.fetch(req).then(res => res.json())
     if (rootPath) return json({ api, gettingStarted, examples, user })
     
-    // TODO: Implement this
-    const [ resource, id ] = pathSegments
-    const data = { resource, id, hello: user.city }
+    let data
     
-    return json({ api, data, user })
+    try {
+      data = JSON.parse(pathSegments.join('/')) // Converts all path segments ignoring slashes
+    catch (e) {
+      return new Response('{ "success": false, "error": "Failed to parse JSON." }', { headers: { ContentType: 'application/json; charset=utf-8' }, status: 400 })
+    }
+    
+    return json(data)
   }
 }
 
