@@ -32,7 +32,7 @@ export default {
     
     try {
       data = JSON.parse(pathSegments.join('/')) // Converts all path segments ignoring slashes
-    catch (e) {
+    } catch (e) {
       return new Response('{ "success": false, "error": "Failed to parse JSON." }', { headers: { ContentType: 'application/json; charset=utf-8' }, status: 400 })
     }
     
